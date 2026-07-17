@@ -233,6 +233,7 @@ function renderTasks(){
       <span class="task-owner">${task.owner}</span>
       <div class="task-text">${task.text}</div>
       <div class="task-xp">+${task.xp} xp</div>
+      <button class="task-delete" onclick="event.stopPropagation(); deleteTask(${i})">×</button>
     `;
     list.appendChild(row);
   });
@@ -278,6 +279,13 @@ function renderBadges(){
     `;
     grid.appendChild(el);
   });
+}
+
+function deleteTask(i){
+  state.tasks.splice(i, 1);
+  saveTasks();
+  renderDayStrip();
+  renderTasks();
 }
 
 function toggleTask(i){
