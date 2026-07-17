@@ -145,17 +145,25 @@
       </div>
     </header>
 
+    <div class="week-header">
+      <button class="week-arrow" onclick="changeWeek(-1)">‹</button>
+      <span id="week-range-label"></span>
+      <button class="week-arrow" onclick="changeWeek(1)">›</button>
+    </div>
+    <div class="day-strip" id="day-strip"></div>
+
     <div class="owner-tabs" id="owner-tabs">
       <div class="owner-tab active" data-owner="Todas">Todas</div>
       <div class="owner-tab" data-owner="Kayky">Kayky</div>
       <div class="owner-tab" data-owner="Ju">Ju</div>
     </div>
 
-    <div class="section-title">Tarefas de hoje <span class="count" id="task-count"></span></div>
+    <div class="section-title" id="task-day-title">Hoje <span class="count" id="task-count"></span></div>
     <div class="task-list" id="task-list"></div>
 
     <div class="add-row">
       <input type="text" id="new-task" placeholder="Nova tarefa..." onkeydown="if(event.key==='Enter') addTask()">
+      <input type="time" id="new-task-time" value="08:00">
       <select id="new-task-owner">
         <option value="Kayky">Kayky</option>
         <option value="Ju">Ju</option>

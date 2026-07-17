@@ -84,6 +84,53 @@ h1{ font-family:var(--font-display); font-weight:600; font-size:26px; }
 .trail-dot.today{ border-color:var(--gold); color:var(--gold); }
 .trail-label{ font-size:11px; color:var(--ink-dim); text-transform:uppercase; letter-spacing:0.03em; }
 
+/* Week strip */
+.week-header{
+  display:flex; align-items:center; justify-content:space-between;
+  margin-bottom:12px;
+}
+.week-arrow{
+  background:var(--surface); border:1px solid var(--border); border-radius:8px;
+  width:32px; height:32px; cursor:pointer; font-size:20px; color:var(--ink-dim);
+  display:flex; align-items:center; justify-content:center; line-height:1;
+}
+.week-arrow:hover{ background:var(--bg); }
+#week-range-label{ font-family:var(--font-mono); font-size:13px; color:var(--ink-dim); }
+
+.day-strip{
+  display:grid; grid-template-columns:repeat(7,1fr); gap:4px;
+  background:var(--surface); border:1px solid var(--border);
+  border-radius:12px; padding:8px; margin-bottom:20px;
+}
+.day-btn{
+  display:flex; flex-direction:column; align-items:center; gap:4px;
+  padding:8px 4px; border-radius:8px; cursor:pointer;
+  transition:background 0.15s ease;
+}
+.day-btn:hover{ background:var(--bg); }
+.day-btn.selected{ background:var(--blue-bg); }
+.day-btn.selected .day-name,
+.day-btn.selected .day-num{ color:var(--blue); }
+.day-name{
+  font-size:10px; text-transform:uppercase; letter-spacing:0.05em; color:var(--ink-dim);
+}
+.day-num{
+  font-family:var(--font-mono); font-size:14px; font-weight:500; color:var(--ink);
+  width:26px; height:26px; display:flex; align-items:center; justify-content:center;
+  border-radius:50%;
+}
+.day-btn.today .day-num{ background:var(--ink); color:#fff; }
+.day-btn.today.selected .day-num{ background:var(--blue); color:#fff; }
+.day-dot{
+  width:5px; height:5px; border-radius:50%; background:var(--gold);
+}
+.day-dot.hidden{ visibility:hidden; }
+
+.task-time{
+  font-family:var(--font-mono); font-size:11px; color:var(--ink-dim);
+  flex-shrink:0; min-width:36px;
+}
+
 /* Tasks */
 .owner-tabs{ display:flex; gap:6px; margin-bottom:14px; }
 .owner-tab{
