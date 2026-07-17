@@ -133,9 +133,8 @@ h1{ font-family:var(--font-display); font-weight:600; font-size:26px; }
 .task-delete{
   background:none; border:none; color:var(--ink-dim); font-size:17px;
   cursor:pointer; padding:0 2px; line-height:1; flex-shrink:0;
-  opacity:0; transition:opacity 0.15s ease, color 0.15s ease;
+  transition:color 0.15s ease;
 }
-.task:hover .task-delete{ opacity:1; }
 .task-delete:hover{ color:var(--coral); }
 
 /* Tasks */
