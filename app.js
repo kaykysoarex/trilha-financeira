@@ -257,6 +257,7 @@ function renderTasks(){
       <span class="task-owner">${task.owner}</span>
       <div class="task-text">${task.text}</div>
       <div class="task-xp">+${task.xp} xp</div>
+      <button class="task-delete" onclick="event.stopPropagation(); deleteTask(${i})">×</button>
     `;
     overviewList.appendChild(row);
   });
