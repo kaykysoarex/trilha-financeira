@@ -113,18 +113,21 @@
 
     <div class="section-title">Registrar gasto</div>
     <div class="expense-row">
-      <input type="text" id="expense-desc" placeholder="Ex: mercado, gasolina, jigs...">
+      <input type="text" id="expense-desc" placeholder="Ex: mercado, gasolina, cinema..." oninput="autoDetectCategory()">
       <input type="number" id="expense-value" placeholder="R$">
       <select id="expense-owner">
         <option value="Kayky">Kayky</option>
         <option value="Ju">Ju</option>
       </select>
       <select id="expense-category">
-        <option value="Fixo">Fixo</option>
-        <option value="Variável">Variável</option>
-        <option value="Lazer">Lazer</option>
-        <option value="Investimento">Investimento</option>
-        <option value="Outros">Outros</option>
+        <option value="Comida">🍽️ Comida</option>
+        <option value="Transporte">🚗 Transporte</option>
+        <option value="Lazer">🎮 Lazer</option>
+        <option value="Saúde">💊 Saúde</option>
+        <option value="Comércio">🛍️ Comércio</option>
+        <option value="Fixo">🏠 Fixo</option>
+        <option value="Investimento">💰 Investimento</option>
+        <option value="Outros">📦 Outros</option>
       </select>
       <button onclick="addExpense()">Adicionar</button>
     </div>

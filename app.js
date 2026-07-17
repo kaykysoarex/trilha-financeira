@@ -9,8 +9,8 @@ const state = {
   budgetGoal: 700,
   trailDone: [true, true, true, true, true, true, false],
   expenses: [
-    { desc: 'Mercado da semana', value: 210, owner: 'Ju', category: 'Fixo' },
-    { desc: 'Gasolina', value: 90, owner: 'Kayky', category: 'Variável' }
+    { desc: 'Mercado da semana', value: 210, owner: 'Ju', category: 'Comida' },
+    { desc: 'Gasolina', value: 90, owner: 'Kayky', category: 'Transporte' }
   ],
   tasks: [
     { text: 'Registrar gasto do mercado', xp: 10, done: true, owner: 'Ju' },
@@ -221,12 +221,39 @@ function updateBudgetGoal(){
   render();
 }
 
+const categoryKeywords = {
+  'Comida':       ['mercado', 'supermercado', 'restaurante', 'lanche', 'almoço', 'jantar', 'café', 'pizza', 'hamburguer', 'hambúrguer', 'comida', 'padaria', 'açougue', 'feira', 'delivery', 'ifood', 'refeição', 'churrasco', 'sushi', 'lanchonete', 'sorveteria', 'hortifruti', 'marmita', 'burguer'],
+  'Transporte':   ['gasolina', 'combustível', 'combustivel', 'uber', 'ônibus', 'onibus', 'metrô', 'metro', 'táxi', 'taxi', '99', 'estacionamento', 'pedágio', 'pedagio', 'passagem', 'bicicleta', 'moto', 'carro', 'abastecimento'],
+  'Lazer':        ['cinema', 'show', 'teatro', 'viagem', 'hotel', 'passeio', 'netflix', 'spotify', 'jogo', 'game', 'parque', 'bar', 'balada', 'festa', 'streaming', 'disney', 'youtube', 'prime', 'ingresso', 'diversão', 'diversao'],
+  'Saúde':        ['farmácia', 'farmacia', 'remédio', 'remedio', 'médico', 'medico', 'consulta', 'exame', 'hospital', 'academia', 'dentista', 'plano', 'vitamina', 'suplemento', 'fisioterapia', 'psicólogo', 'psicologo'],
+  'Comércio':     ['loja', 'roupa', 'sapato', 'tênis', 'tenis', 'shopping', 'magazine', 'americanas', 'amazon', 'shopee', 'aliexpress', 'eletrônico', 'eletronico', 'celular', 'notebook', 'compras', 'mercadinha'],
+  'Fixo':         ['aluguel', 'internet', 'água', 'agua', 'luz', 'energia', 'gás', 'gas', 'condomínio', 'condominio', 'mensalidade', 'conta', 'boleto', 'seguro', 'iptu', 'ipva'],
+  'Investimento': ['investimento', 'poupança', 'poupanca', 'ações', 'acoes', 'fundo', 'tesouro', 'cripto', 'bitcoin', 'corretora', 'aporte'],
+};
+
+function autoDetectCategory(){
+  const desc = document.getElementById('expense-desc').value.toLowerCase();
+  const select = document.getElementById('expense-category');
+  for (const [cat, keywords] of Object.entries(categoryKeywords)){
+    if (keywords.some(k => desc.includes(k))){
+      select.value = cat;
+      select.style.borderColor = 'var(--blue)';
+      setTimeout(() => { select.style.borderColor = ''; }, 800);
+      return;
+    }
+  }
+  select.value = 'Outros';
+}
+
 const categoryColors = {
-  'Fixo': '#2E5CE6',
-  'Variável': '#B8842A',
-  'Lazer': '#C4522E',
-  'Investimento': '#1F8A5B',
-  'Outros': '#74766C'
+  'Comida':       '#E8854A',
+  'Transporte':   '#2E5CE6',
+  'Lazer':        '#C4522E',
+  'Saúde':        '#1F8A5B',
+  'Comércio':     '#7C3AED',
+  'Fixo':         '#4A7FA5',
+  'Investimento': '#B8842A',
+  'Outros':       '#74766C'
 };
 let categoryChart = null;
 
