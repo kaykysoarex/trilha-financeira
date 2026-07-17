@@ -168,7 +168,8 @@ function render(){
 
   const expList = document.getElementById('expense-list');
   expList.innerHTML = '';
-  [...state.expenses].reverse().forEach(e => {
+  [...state.expenses].reverse().forEach((e, ri) => {
+    const i   = state.expenses.length - 1 - ri;
     const row = document.createElement('div');
     row.className = 'task';
     row.style.cursor = 'default';
@@ -176,6 +177,7 @@ function render(){
       <span class="task-owner">${e.owner}</span>
       <div class="task-text">${e.desc}</div>
       <div class="task-xp" style="color:var(--coral)">${formatBRL(e.value)}</div>
+      <button class="task-delete" onclick="deleteExpense(${i})">×</button>
     `;
     expList.appendChild(row);
   });
@@ -279,6 +281,12 @@ function renderBadges(){
     `;
     grid.appendChild(el);
   });
+}
+
+function deleteExpense(i){
+  state.spent -= state.expenses[i].value;
+  state.expenses.splice(i, 1);
+  render();
 }
 
 function deleteTask(i){
