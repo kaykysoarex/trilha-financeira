@@ -29,8 +29,19 @@ function saveTasks(){
 function loadTasks(){
   try {
     const saved = localStorage.getItem('trilha-tasks');
-    if (saved) state.tasks = JSON.parse(saved);
+    if (saved) {
+      state.tasks = JSON.parse(saved).map(t =>
+        (t.timeStart === undefined && t.time !== undefined)
+          ? { ...t, timeStart: t.time, timeEnd: '' }
+          : t
+      );
+    }
   } catch(e){}
+}
+
+function timesOverlap(startA, endA, startB, endB){
+  if (!startA || !endA || !startB || !endB) return false;
+  return startA < endB && startB < endA;
 }
 
 // ---- State ----
@@ -49,9 +60,9 @@ const state = {
     { desc: 'Gasolina', value: 90, owner: 'Kayky', category: 'Transporte' }
   ],
   tasks: [
-    { text: 'Registrar gasto do mercado', xp: 10, done: true,  owner: 'Ju',    date: getTodayISO(), time: '08:00' },
-    { text: 'Separar orçamento Urutau',   xp: 10, done: false, owner: 'Kayky', date: getTodayISO(), time: '10:00' },
-    { text: 'Treino Muay Thai',           xp: 10, done: false, owner: 'Kayky', date: getTodayISO(), time: '19:00' }
+    { text: 'Registrar gasto do mercado', xp: 10, done: true,  owner: 'Ju',    date: getTodayISO(), timeStart: '08:00', timeEnd: '09:00' },
+    { text: 'Separar orçamento Urutau',   xp: 10, done: false, owner: 'Kayky', date: getTodayISO(), timeStart: '10:00', timeEnd: '11:00' },
+    { text: 'Treino Muay Thai',           xp: 10, done: false, owner: 'Kayky', date: getTodayISO(), timeStart: '19:00', timeEnd: '20:30' }
   ],
   badges: [
     { icon:'🎯', title:'No controle',     desc:'Gastar menos da metade da meta da semana.', key:'halfBudget' },
@@ -212,7 +223,7 @@ function renderTasks(){
   const today    = getTodayISO();
   const dayTasks = state.tasks.filter(t => t.date === selectedDate);
   const filtered = taskFilter === 'Todas' ? dayTasks : dayTasks.filter(t => t.owner === taskFilter);
-  filtered.sort((a, b) => (a.time || '00:00').localeCompare(b.time || '00:00'));
+  filtered.sort((a, b) => (a.timeStart || a.time || '00:00').localeCompare(b.timeStart || b.time || '00:00'));
 
   // Dynamic section title
   const selD   = new Date(selectedDate + 'T12:00:00');
@@ -231,7 +242,7 @@ function renderTasks(){
     row.onclick   = () => toggleTask(i);
     row.innerHTML = `
       <div class="check">${task.done ? '✓' : ''}</div>
-      ${task.time ? `<span class="task-time">${task.time}</span>` : ''}
+      ${task.timeStart ? `<span class="task-time">${task.timeStart}${task.timeEnd ? ` – ${task.timeEnd}` : ''}</span>` : ''}
       <span class="task-owner">${task.owner}</span>
       <div class="task-text">${task.text}</div>
       <div class="task-xp">+${task.xp} xp</div>
@@ -253,7 +264,7 @@ function renderTasks(){
     row.onclick   = () => toggleTask(i);
     row.innerHTML = `
       <div class="check"></div>
-      ${task.time ? `<span class="task-time">${task.time}</span>` : ''}
+      ${task.timeStart ? `<span class="task-time">${task.timeStart}${task.timeEnd ? ` – ${task.timeEnd}` : ''}</span>` : ''}
       <span class="task-owner">${task.owner}</span>
       <div class="task-text">${task.text}</div>
       <div class="task-xp">+${task.xp} xp</div>
@@ -307,12 +318,26 @@ function toggleTask(i){
 }
 
 function addTask(){
-  const input = document.getElementById('new-task');
-  const owner = document.getElementById('new-task-owner').value;
-  const time  = document.getElementById('new-task-time').value;
-  const text  = input.value.trim();
+  const input     = document.getElementById('new-task');
+  const owner     = document.getElementById('new-task-owner').value;
+  const timeStart = document.getElementById('new-task-time-start').value;
+  const timeEnd   = document.getElementById('new-task-time-end').value;
+  const text      = input.value.trim();
   if (!text) return;
-  state.tasks.push({ text, xp: 10, done: false, owner, date: selectedDate, time });
+
+  if (timeStart && timeEnd && timeStart >= timeEnd){
+    showToast('⚠️', 'Horário inválido', 'O início deve ser antes do término.');
+    return;
+  }
+
+  const conflict = state.tasks.filter(t => t.date === selectedDate)
+    .find(t => timesOverlap(timeStart, timeEnd, t.timeStart, t.timeEnd));
+  if (conflict){
+    showToast('⏰', 'Horário ocupado', `${conflict.timeStart} – ${conflict.timeEnd} já está em uso: "${conflict.text}".`);
+    return;
+  }
+
+  state.tasks.push({ text, xp: 10, done: false, owner, date: selectedDate, timeStart, timeEnd });
   input.value = '';
   saveTasks();
   renderDayStrip();

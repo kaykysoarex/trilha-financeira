@@ -163,7 +163,11 @@
 
     <div class="add-row">
       <input type="text" id="new-task" placeholder="Nova tarefa..." onkeydown="if(event.key==='Enter') addTask()">
-      <input type="time" id="new-task-time" value="08:00">
+      <div class="time-range">
+        <input type="time" id="new-task-time-start" value="08:00">
+        <span class="time-sep">às</span>
+        <input type="time" id="new-task-time-end" value="09:00">
+      </div>
       <select id="new-task-owner">
         <option value="Kayky">Kayky</option>
         <option value="Ju">Ju</option>
