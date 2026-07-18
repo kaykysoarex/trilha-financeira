@@ -15,9 +15,11 @@
 <div id="welcome-screen">
   <div class="welcome-card">
     <div class="welcome-brand">Trilha</div>
-    <h2 class="welcome-title">Qual é o seu nome?</h2>
-    <p class="welcome-sub">Suas informações ficam salvas aqui.</p>
+    <h2 class="welcome-title">Quem está aqui?</h2>
+    <p class="welcome-sub">Suas informações ficam salvas por nome.</p>
     <input type="text" id="user-name-input" placeholder="Seu nome..."
+           onkeydown="if(event.key==='Enter') document.getElementById('partner-name-input').focus()">
+    <input type="text" id="partner-name-input" placeholder="Nome do(a) parceiro(a)..."
            onkeydown="if(event.key==='Enter') startSession()">
     <button onclick="startSession()">Entrar</button>
   </div>
@@ -130,10 +132,7 @@
     <div class="expense-row">
       <input type="text" id="expense-desc" placeholder="Ex: mercado, gasolina, cinema..." oninput="autoDetectCategory()">
       <input type="number" id="expense-value" placeholder="R$">
-      <select id="expense-owner">
-        <option value="Kayky">Kayky</option>
-        <option value="Ju">Ju</option>
-      </select>
+      <select id="expense-owner"></select>
       <select id="expense-category">
         <option value="Comida">🍽️ Comida</option>
         <option value="Transporte">🚗 Transporte</option>
@@ -169,8 +168,8 @@
 
     <div class="owner-tabs" id="owner-tabs">
       <div class="owner-tab active" data-owner="Todas">Todas</div>
-      <div class="owner-tab" data-owner="Kayky">Kayky</div>
-      <div class="owner-tab" data-owner="Ju">Ju</div>
+      <div class="owner-tab" data-slot="me"></div>
+      <div class="owner-tab" data-slot="partner"></div>
     </div>
 
     <div class="section-title" id="task-day-title">Hoje <span class="count" id="task-count"></span></div>
@@ -183,10 +182,7 @@
         <span class="time-sep">às</span>
         <input type="time" id="new-task-time-end" value="09:00">
       </div>
-      <select id="new-task-owner">
-        <option value="Kayky">Kayky</option>
-        <option value="Ju">Ju</option>
-      </select>
+      <select id="new-task-owner"></select>
       <button onclick="addTask()">Adicionar</button>
     </div>
     <div class="repeat-days">

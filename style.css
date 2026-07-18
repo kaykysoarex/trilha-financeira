@@ -39,12 +39,12 @@ body{
 .welcome-brand{ font-family:var(--font-display); font-size:22px; font-weight:600; }
 .welcome-title{ font-family:var(--font-display); font-size:19px; font-weight:600; }
 .welcome-sub{ font-size:13px; color:var(--ink-dim); margin-top:-4px; }
-#user-name-input{
+#user-name-input, #partner-name-input{
   background:var(--bg); border:1px solid var(--border); border-radius:10px;
   padding:12px 14px; font-size:16px; font-family:var(--font-body);
   color:var(--ink); width:100%; text-align:center;
 }
-#user-name-input:focus{ outline:none; border-color:var(--blue); }
+#user-name-input:focus, #partner-name-input:focus{ outline:none; border-color:var(--blue); }
 .welcome-card button{
   background:var(--ink); color:#fff; border:none; border-radius:10px;
   padding:13px; font-size:15px; font-family:var(--font-body);

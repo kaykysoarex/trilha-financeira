@@ -23,17 +23,50 @@ function getWeekDays(offset){
 
 // ---- Usuário e persistência ----
 let currentUser = null;
+let partnerName = '';
 
 function saveUserData(){
   if (!currentUser) return;
   localStorage.setItem('trilha-data-' + currentUser, JSON.stringify({
-    tasks:      state.tasks,
-    expenses:   state.expenses,
-    income:     state.income,
-    budgetGoal: state.budgetGoal,
-    xp:         state.xp,
-    unlocked:   state.unlocked,
+    tasks:       state.tasks,
+    expenses:    state.expenses,
+    income:      state.income,
+    budgetGoal:  state.budgetGoal,
+    xp:          state.xp,
+    unlocked:    state.unlocked,
+    partnerName: partnerName,
   }));
+}
+
+function updateOwnerNames(){
+  const me      = currentUser  || 'Eu';
+  const partner = partnerName  || 'Parceiro(a)';
+
+  // Tabs de filtro
+  const tabMe      = document.querySelector('#owner-tabs [data-slot="me"]');
+  const tabPartner = document.querySelector('#owner-tabs [data-slot="partner"]');
+  if (tabMe)      { tabMe.dataset.owner      = me;      tabMe.textContent      = me;      }
+  if (tabPartner) { tabPartner.dataset.owner = partner; tabPartner.textContent = partner; }
+
+  // Reanexa listeners nas tabs (reset completo)
+  document.querySelectorAll('.owner-tab').forEach(tab => {
+    tab.onclick = () => {
+      document.querySelectorAll('.owner-tab').forEach(t => t.classList.remove('active'));
+      tab.classList.add('active');
+      taskFilter = tab.dataset.owner;
+      renderTasks();
+    };
+  });
+
+  // Select de tarefa
+  const taskOwnerSel = document.getElementById('new-task-owner');
+  if (taskOwnerSel) taskOwnerSel.innerHTML =
+    `<option value="${me}">${me}</option><option value="${partner}">${partner}</option>`;
+
+  // Select de gasto
+  const expOwnerSel = document.getElementById('expense-owner');
+  if (expOwnerSel) expOwnerSel.innerHTML =
+    `<option value="${me}">${me}</option><option value="${partner}">${partner}</option>`;
 }
 
 function loadUserData(name){
@@ -45,11 +78,12 @@ function loadUserData(name){
   state.spentGoal  = 700;
   state.spent      = 0;
   state.unlocked   = {};
+  partnerName      = '';
   try {
     const saved = localStorage.getItem('trilha-data-' + name);
     if (saved){
       const data = JSON.parse(saved);
-      if (data.tasks)     state.tasks     = data.tasks.map(t =>
+      if (data.tasks)                 state.tasks      = data.tasks.map(t =>
         (t.timeStart === undefined && t.time !== undefined)
           ? { ...t, timeStart: t.time, timeEnd: '' } : t
       );
@@ -58,33 +92,39 @@ function loadUserData(name){
       if (data.budgetGoal !== undefined){ state.budgetGoal = data.budgetGoal; state.spentGoal = data.budgetGoal; }
       if (data.xp         !== undefined) state.xp         = data.xp;
       if (data.unlocked)              state.unlocked   = data.unlocked;
+      if (data.partnerName)           partnerName      = data.partnerName;
       state.spent = state.expenses.reduce((s, e) => s + e.value, 0);
     }
   } catch(e){}
 }
 
 function startSession(){
-  const input = document.getElementById('user-name-input');
-  const name  = input.value.trim();
+  const name    = document.getElementById('user-name-input').value.trim();
+  const partner = document.getElementById('partner-name-input').value.trim();
   if (!name) return;
   currentUser = name;
   localStorage.setItem('trilha-user', name);
   loadUserData(name);
+  if (partner) partnerName = partner;
+  saveUserData();
   document.getElementById('user-display').textContent = name;
   document.getElementById('welcome-screen').classList.add('hidden');
   document.getElementById('budget-goal').value  = state.budgetGoal;
   document.getElementById('income-value').value = state.income || '';
+  updateOwnerNames();
   render();
 }
 
 function logout(){
   currentUser = null;
+  partnerName = '';
   localStorage.removeItem('trilha-user');
   state.tasks = []; state.expenses = []; state.xp = 0;
   state.income = 0; state.budgetGoal = 700; state.spentGoal = 700;
   state.spent = 0; state.unlocked = {};
   document.getElementById('welcome-screen').classList.remove('hidden');
-  document.getElementById('user-name-input').value = '';
+  document.getElementById('user-name-input').value    = '';
+  document.getElementById('partner-name-input').value = '';
   document.getElementById('user-display').textContent = '';
 }
 
@@ -138,14 +178,6 @@ document.querySelectorAll('.nav-item').forEach(item => {
   });
 });
 
-document.querySelectorAll('.owner-tab').forEach(tab => {
-  tab.addEventListener('click', () => {
-    document.querySelectorAll('.owner-tab').forEach(t => t.classList.remove('active'));
-    tab.classList.add('active');
-    taskFilter = tab.dataset.owner;
-    renderTasks();
-  });
-});
 
 // ---- Week strip ----
 function changeWeek(dir){
@@ -368,8 +400,8 @@ function editTask(i){
         <input type="time" class="task-edit-end" value="${task.timeEnd || ''}">
       </div>
       <select class="task-edit-owner">
-        <option value="Kayky" ${task.owner === 'Kayky' ? 'selected' : ''}>Kayky</option>
-        <option value="Ju" ${task.owner === 'Ju' ? 'selected' : ''}>Ju</option>
+        <option value="${currentUser}" ${task.owner === currentUser ? 'selected' : ''}>${currentUser}</option>
+        <option value="${partnerName}" ${task.owner === partnerName ? 'selected' : ''}>${partnerName}</option>
       </select>
       <button class="btn-save-edit" onclick="saveTaskEdit(${i})">Salvar</button>
       <button class="btn-cancel-edit" onclick="renderTasks()">Cancelar</button>
@@ -624,5 +656,6 @@ if (savedUser){
   document.getElementById('welcome-screen').classList.add('hidden');
   document.getElementById('budget-goal').value  = state.budgetGoal;
   document.getElementById('income-value').value = state.income || '';
+  updateOwnerNames();
   render();
 }
