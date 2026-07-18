@@ -174,10 +174,16 @@
       </select>
       <button onclick="addTask()">Adicionar</button>
     </div>
-    <label class="week-repeat-toggle">
-      <input type="checkbox" id="repeat-week">
-      <span>Repetir seg – sex (semana toda)</span>
-    </label>
+    <div class="repeat-days">
+      <span class="repeat-label">Repetir em:</span>
+      <button type="button" class="day-pick" data-day="0">seg</button>
+      <button type="button" class="day-pick" data-day="1">ter</button>
+      <button type="button" class="day-pick" data-day="2">qua</button>
+      <button type="button" class="day-pick" data-day="3">qui</button>
+      <button type="button" class="day-pick" data-day="4">sex</button>
+      <button type="button" class="day-pick" data-day="5">sáb</button>
+      <button type="button" class="day-pick" data-day="6">dom</button>
+    </div>
   </div>
 
   <!-- ===== CONQUISTAS ===== -->

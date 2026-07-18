@@ -322,7 +322,6 @@ function addTask(){
   const owner      = document.getElementById('new-task-owner').value;
   const timeStart  = document.getElementById('new-task-time-start').value;
   const timeEnd    = document.getElementById('new-task-time-end').value;
-  const repeatWeek = document.getElementById('repeat-week').checked;
   const text       = input.value.trim();
   if (!text) return;
 
@@ -331,11 +330,14 @@ function addTask(){
     return;
   }
 
-  if (repeatWeek){
-    const weekDays  = getWeekDays(weekOffset).slice(0, 5); // seg–sex
+  const selectedDayIndices = [...document.querySelectorAll('.day-pick.active')]
+    .map(b => parseInt(b.dataset.day));
+
+  if (selectedDayIndices.length > 0){
+    const weekDays = getWeekDays(weekOffset);
     let added = 0, skipped = 0;
-    weekDays.forEach(d => {
-      const iso      = dateToISO(d);
+    selectedDayIndices.forEach(idx => {
+      const iso      = dateToISO(weekDays[idx]);
       const conflict = state.tasks.filter(t => t.date === iso)
         .find(t => timesOverlap(timeStart, timeEnd, t.timeStart, t.timeEnd));
       if (conflict){ skipped++; return; }
@@ -347,7 +349,7 @@ function addTask(){
     renderDayStrip();
     renderTasks();
     const msg = skipped > 0
-      ? `Adicionada em ${added} dia(s). ${skipped} dia(s) com conflito de horário ignorado(s).`
+      ? `Adicionada em ${added} dia(s). ${skipped} dia(s) com conflito ignorado.`
       : `Adicionada em ${added} dia(s) da semana.`;
     showToast('📅', 'Tarefa semanal', msg);
     return;
@@ -508,6 +510,10 @@ function showToast(icon, title, body){
     setTimeout(() => toast.remove(), 300);
   }, 3800);
 }
+
+document.querySelectorAll('.day-pick').forEach(btn => {
+  btn.addEventListener('click', () => btn.classList.toggle('active'));
+});
 
 document.getElementById('budget-goal').value  = state.budgetGoal;
 document.getElementById('income-value').value = state.income || '';
