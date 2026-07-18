@@ -318,15 +318,38 @@ function toggleTask(i){
 }
 
 function addTask(){
-  const input     = document.getElementById('new-task');
-  const owner     = document.getElementById('new-task-owner').value;
-  const timeStart = document.getElementById('new-task-time-start').value;
-  const timeEnd   = document.getElementById('new-task-time-end').value;
-  const text      = input.value.trim();
+  const input      = document.getElementById('new-task');
+  const owner      = document.getElementById('new-task-owner').value;
+  const timeStart  = document.getElementById('new-task-time-start').value;
+  const timeEnd    = document.getElementById('new-task-time-end').value;
+  const repeatWeek = document.getElementById('repeat-week').checked;
+  const text       = input.value.trim();
   if (!text) return;
 
   if (timeStart && timeEnd && timeStart >= timeEnd){
     showToast('⚠️', 'Horário inválido', 'O início deve ser antes do término.');
+    return;
+  }
+
+  if (repeatWeek){
+    const weekDays  = getWeekDays(weekOffset).slice(0, 5); // seg–sex
+    let added = 0, skipped = 0;
+    weekDays.forEach(d => {
+      const iso      = dateToISO(d);
+      const conflict = state.tasks.filter(t => t.date === iso)
+        .find(t => timesOverlap(timeStart, timeEnd, t.timeStart, t.timeEnd));
+      if (conflict){ skipped++; return; }
+      state.tasks.push({ text, xp: 10, done: false, owner, date: iso, timeStart, timeEnd });
+      added++;
+    });
+    input.value = '';
+    saveTasks();
+    renderDayStrip();
+    renderTasks();
+    const msg = skipped > 0
+      ? `Adicionada em ${added} dia(s). ${skipped} dia(s) com conflito de horário ignorado(s).`
+      : `Adicionada em ${added} dia(s) da semana.`;
+    showToast('📅', 'Tarefa semanal', msg);
     return;
   }
 
