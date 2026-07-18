@@ -239,6 +239,7 @@ function renderTasks(){
     const i   = state.tasks.indexOf(task);
     const row = document.createElement('div');
     row.className = 'task' + (task.done ? ' done' : '');
+    row.dataset.idx = i;
     row.onclick   = () => toggleTask(i);
     row.innerHTML = `
       <div class="check">${task.done ? '✓' : ''}</div>
@@ -246,6 +247,7 @@ function renderTasks(){
       <span class="task-owner">${task.owner}</span>
       <div class="task-text">${task.text}</div>
       <div class="task-xp">+${task.xp} xp</div>
+      <button class="task-edit" onclick="event.stopPropagation(); editTask(${i})">✎</button>
       <button class="task-delete" onclick="event.stopPropagation(); deleteTask(${i})">×</button>
     `;
     list.appendChild(row);
@@ -305,6 +307,59 @@ function deleteTask(i){
   state.tasks.splice(i, 1);
   saveTasks();
   renderDayStrip();
+  renderTasks();
+}
+
+function editTask(i){
+  const task = state.tasks[i];
+  const row  = document.querySelector(`#task-list [data-idx="${i}"]`);
+  if (!row) return;
+  row.onclick   = null;
+  row.className = 'task task-editing';
+  const textEsc = task.text.replace(/"/g, '&quot;');
+  row.innerHTML = `
+    <div class="task-edit-form">
+      <input class="task-edit-text" value="${textEsc}" placeholder="Descrição">
+      <div class="time-range">
+        <input type="time" class="task-edit-start" value="${task.timeStart || ''}">
+        <span class="time-sep">às</span>
+        <input type="time" class="task-edit-end" value="${task.timeEnd || ''}">
+      </div>
+      <select class="task-edit-owner">
+        <option value="Kayky" ${task.owner === 'Kayky' ? 'selected' : ''}>Kayky</option>
+        <option value="Ju" ${task.owner === 'Ju' ? 'selected' : ''}>Ju</option>
+      </select>
+      <button class="btn-save-edit" onclick="saveTaskEdit(${i})">Salvar</button>
+      <button class="btn-cancel-edit" onclick="renderTasks()">Cancelar</button>
+    </div>
+  `;
+  row.querySelector('.task-edit-text').focus();
+}
+
+function saveTaskEdit(i){
+  const row       = document.querySelector(`#task-list [data-idx="${i}"]`);
+  if (!row) return;
+  const text      = row.querySelector('.task-edit-text').value.trim();
+  const timeStart = row.querySelector('.task-edit-start').value;
+  const timeEnd   = row.querySelector('.task-edit-end').value;
+  const owner     = row.querySelector('.task-edit-owner').value;
+  if (!text) return;
+
+  if (timeStart && timeEnd && timeStart >= timeEnd){
+    showToast('⚠️', 'Horário inválido', 'O início deve ser antes do término.');
+    return;
+  }
+
+  const conflict = state.tasks
+    .filter((t, idx) => t.date === state.tasks[i].date && idx !== i)
+    .find(t => timesOverlap(timeStart, timeEnd, t.timeStart, t.timeEnd));
+  if (conflict){
+    showToast('⏰', 'Horário ocupado', `${conflict.timeStart} – ${conflict.timeEnd} já está em uso: "${conflict.text}".`);
+    return;
+  }
+
+  state.tasks[i] = { ...state.tasks[i], text, timeStart, timeEnd, owner };
+  saveTasks();
   renderTasks();
 }
 

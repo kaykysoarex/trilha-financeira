@@ -140,12 +140,43 @@ h1{ font-family:var(--font-display); font-weight:600; font-size:26px; }
 .time-sep{
   font-size:12px; color:var(--ink-dim); white-space:nowrap;
 }
+.task-edit{
+  background:none; border:none; color:var(--ink-dim); font-size:14px;
+  cursor:pointer; padding:0 2px; line-height:1; flex-shrink:0;
+  transition:color 0.15s ease;
+}
+.task-edit:hover{ color:var(--blue); }
 .task-delete{
   background:none; border:none; color:var(--ink-dim); font-size:17px;
   cursor:pointer; padding:0 2px; line-height:1; flex-shrink:0;
   transition:color 0.15s ease;
 }
 .task-delete:hover{ color:var(--coral); }
+
+.task.task-editing{ cursor:default; flex-wrap:wrap; }
+.task-edit-form{
+  display:flex; align-items:center; gap:8px; flex:1; flex-wrap:wrap;
+}
+.task-edit-text{
+  flex:1; min-width:120px; background:var(--bg); border:1px solid var(--border);
+  border-radius:8px; padding:6px 10px; font-size:14px; color:var(--ink);
+  font-family:var(--font-body);
+}
+.task-edit-text:focus{ outline:none; border-color:var(--blue); }
+.task-edit-owner{
+  background:var(--bg); border:1px solid var(--border); border-radius:8px;
+  padding:6px 8px; font-size:13px; color:var(--ink); cursor:pointer;
+}
+.btn-save-edit{
+  background:var(--ink); color:#fff; border:none; border-radius:8px;
+  padding:6px 14px; font-size:13px; font-family:var(--font-body); cursor:pointer;
+}
+.btn-save-edit:hover{ opacity:0.85; }
+.btn-cancel-edit{
+  background:none; color:var(--ink-dim); border:1px solid var(--border);
+  border-radius:8px; padding:6px 12px; font-size:13px; font-family:var(--font-body); cursor:pointer;
+}
+.btn-cancel-edit:hover{ background:var(--bg); }
 
 /* Tasks */
 .owner-tabs{ display:flex; gap:6px; margin-bottom:14px; }
