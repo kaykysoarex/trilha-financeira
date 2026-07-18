@@ -77,6 +77,47 @@ function updateOwnerNames(){
   const expOwnerSel = document.getElementById('expense-owner');
   if (expOwnerSel) expOwnerSel.innerHTML =
     `<option value="${me}">${me}</option>${partnerOpt}`;
+
+  renderPartnerInfo();
+}
+
+function renderPartnerInfo(){
+  const el = document.getElementById('partner-info');
+  if (!el) return;
+  if (partnerName){
+    el.innerHTML = `
+      <div class="partner-row">
+        <span class="partner-label">com ${partnerName}</span>
+        <button class="partner-edit-btn" onclick="showPartnerEdit()">✎</button>
+      </div>`;
+  } else {
+    el.innerHTML = `<button class="partner-add-btn" onclick="showPartnerEdit()">+ parceiro(a)</button>`;
+  }
+}
+
+function showPartnerEdit(){
+  const el = document.getElementById('partner-info');
+  el.innerHTML = `
+    <div class="partner-edit-row">
+      <input id="partner-edit-input" class="partner-edit-input"
+             value="${partnerName}" placeholder="Nome do(a) parceiro(a)">
+      <button class="partner-save-btn" onclick="savePartnerEdit()">✓</button>
+      <button class="partner-cancel-btn" onclick="renderPartnerInfo()">×</button>
+    </div>`;
+  const inp = document.getElementById('partner-edit-input');
+  inp.focus();
+  inp.onkeydown = e => {
+    if (e.key === 'Enter')  savePartnerEdit();
+    if (e.key === 'Escape') renderPartnerInfo();
+  };
+}
+
+function savePartnerEdit(){
+  const inp = document.getElementById('partner-edit-input');
+  if (!inp) return;
+  partnerName = inp.value.trim();
+  saveUserData();
+  updateOwnerNames();
 }
 
 function loadUserData(name){

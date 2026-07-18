@@ -55,6 +55,9 @@ body{
 /* User info in sidebar */
 .user-info{
   margin-top:auto; padding-top:16px; border-top:1px solid var(--border);
+  display:flex; flex-direction:column; gap:6px;
+}
+.user-info-row{
   display:flex; align-items:center; justify-content:space-between; gap:8px;
 }
 #user-display{
@@ -67,6 +70,17 @@ body{
   padding:3px 8px; cursor:pointer; white-space:nowrap; flex-shrink:0;
 }
 .user-info button:hover{ background:var(--bg); }
+.partner-row{ display:flex; align-items:center; gap:5px; }
+.partner-label{ font-size:11px; color:var(--ink-dim); }
+.partner-add-btn{ color:var(--blue) !important; border-color:var(--blue) !important; }
+.partner-edit-row{ display:flex; align-items:center; gap:4px; }
+.partner-edit-input{
+  flex:1; min-width:0; background:var(--bg); border:1px solid var(--border);
+  border-radius:6px; padding:3px 6px; font-size:11px;
+  font-family:var(--font-body); color:var(--ink);
+}
+.partner-edit-input:focus{ outline:none; border-color:var(--blue); }
+.partner-save-btn{ color:var(--green) !important; border-color:var(--green) !important; }
 
 /* Sidebar */
 .sidebar{
