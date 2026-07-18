@@ -25,6 +25,49 @@ body{
   min-height:100vh;
 }
 
+/* Welcome screen */
+#welcome-screen{
+  position:fixed; inset:0; background:var(--bg);
+  display:flex; align-items:center; justify-content:center; z-index:100;
+}
+#welcome-screen.hidden{ display:none; }
+.welcome-card{
+  background:var(--surface); border:1px solid var(--border); border-radius:20px;
+  padding:40px 36px; width:100%; max-width:360px; margin:16px;
+  display:flex; flex-direction:column; gap:14px; text-align:center;
+}
+.welcome-brand{ font-family:var(--font-display); font-size:22px; font-weight:600; }
+.welcome-title{ font-family:var(--font-display); font-size:19px; font-weight:600; }
+.welcome-sub{ font-size:13px; color:var(--ink-dim); margin-top:-4px; }
+#user-name-input{
+  background:var(--bg); border:1px solid var(--border); border-radius:10px;
+  padding:12px 14px; font-size:16px; font-family:var(--font-body);
+  color:var(--ink); width:100%; text-align:center;
+}
+#user-name-input:focus{ outline:none; border-color:var(--blue); }
+.welcome-card button{
+  background:var(--ink); color:#fff; border:none; border-radius:10px;
+  padding:13px; font-size:15px; font-family:var(--font-body);
+  font-weight:500; cursor:pointer; width:100%;
+}
+.welcome-card button:hover{ opacity:0.85; }
+
+/* User info in sidebar */
+.user-info{
+  margin-top:auto; padding-top:16px; border-top:1px solid var(--border);
+  display:flex; align-items:center; justify-content:space-between; gap:8px;
+}
+#user-display{
+  font-size:13px; font-weight:500; color:var(--ink);
+  overflow:hidden; text-overflow:ellipsis; white-space:nowrap;
+}
+.user-info button{
+  font-size:11px; color:var(--ink-dim); background:none;
+  border:1px solid var(--border); border-radius:6px;
+  padding:3px 8px; cursor:pointer; white-space:nowrap; flex-shrink:0;
+}
+.user-info button:hover{ background:var(--bg); }
+
 /* Sidebar */
 .sidebar{
   width: 200px; flex-shrink:0; background:var(--surface); border-right:1px solid var(--border);
@@ -315,6 +358,7 @@ footer{ color:var(--ink-dim); font-size:12px; margin-top:20px; }
     gap: 0;
   }
   .brand{ display: none; }
+  .user-info{ display: none; }
   .nav-item{
     flex-direction: column;
     align-items: center;

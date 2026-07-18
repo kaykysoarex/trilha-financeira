@@ -21,23 +21,74 @@ function getWeekDays(offset){
   });
 }
 
-// ---- localStorage ----
-function saveTasks(){
-  localStorage.setItem('trilha-tasks', JSON.stringify(state.tasks));
+// ---- Usuário e persistência ----
+let currentUser = null;
+
+function saveUserData(){
+  if (!currentUser) return;
+  localStorage.setItem('trilha-data-' + currentUser, JSON.stringify({
+    tasks:      state.tasks,
+    expenses:   state.expenses,
+    income:     state.income,
+    budgetGoal: state.budgetGoal,
+    xp:         state.xp,
+    unlocked:   state.unlocked,
+  }));
 }
 
-function loadTasks(){
+function loadUserData(name){
+  state.tasks      = [];
+  state.expenses   = [];
+  state.xp         = 0;
+  state.income     = 0;
+  state.budgetGoal = 700;
+  state.spentGoal  = 700;
+  state.spent      = 0;
+  state.unlocked   = {};
   try {
-    const saved = localStorage.getItem('trilha-tasks');
-    if (saved) {
-      state.tasks = JSON.parse(saved).map(t =>
+    const saved = localStorage.getItem('trilha-data-' + name);
+    if (saved){
+      const data = JSON.parse(saved);
+      if (data.tasks)     state.tasks     = data.tasks.map(t =>
         (t.timeStart === undefined && t.time !== undefined)
-          ? { ...t, timeStart: t.time, timeEnd: '' }
-          : t
+          ? { ...t, timeStart: t.time, timeEnd: '' } : t
       );
+      if (data.expenses)              state.expenses   = data.expenses;
+      if (data.income     !== undefined) state.income     = data.income;
+      if (data.budgetGoal !== undefined){ state.budgetGoal = data.budgetGoal; state.spentGoal = data.budgetGoal; }
+      if (data.xp         !== undefined) state.xp         = data.xp;
+      if (data.unlocked)              state.unlocked   = data.unlocked;
+      state.spent = state.expenses.reduce((s, e) => s + e.value, 0);
     }
   } catch(e){}
 }
+
+function startSession(){
+  const input = document.getElementById('user-name-input');
+  const name  = input.value.trim();
+  if (!name) return;
+  currentUser = name;
+  localStorage.setItem('trilha-user', name);
+  loadUserData(name);
+  document.getElementById('user-display').textContent = name;
+  document.getElementById('welcome-screen').classList.add('hidden');
+  document.getElementById('budget-goal').value  = state.budgetGoal;
+  document.getElementById('income-value').value = state.income || '';
+  render();
+}
+
+function logout(){
+  currentUser = null;
+  localStorage.removeItem('trilha-user');
+  state.tasks = []; state.expenses = []; state.xp = 0;
+  state.income = 0; state.budgetGoal = 700; state.spentGoal = 700;
+  state.spent = 0; state.unlocked = {};
+  document.getElementById('welcome-screen').classList.remove('hidden');
+  document.getElementById('user-name-input').value = '';
+  document.getElementById('user-display').textContent = '';
+}
+
+function saveTasks(){ saveUserData(); }
 
 function timesOverlap(startA, endA, startB, endB){
   if (!startA || !endA || !startB || !endB) return false;
@@ -55,15 +106,8 @@ const state = {
   income: 0,
   budgetGoal: 700,
   trailDone: [true, true, true, true, true, true, false],
-  expenses: [
-    { desc: 'Mercado da semana', value: 210, owner: 'Ju', category: 'Comida' },
-    { desc: 'Gasolina', value: 90, owner: 'Kayky', category: 'Transporte' }
-  ],
-  tasks: [
-    { text: 'Registrar gasto do mercado', xp: 10, done: true,  owner: 'Ju',    date: getTodayISO(), timeStart: '08:00', timeEnd: '09:00' },
-    { text: 'Separar orçamento Urutau',   xp: 10, done: false, owner: 'Kayky', date: getTodayISO(), timeStart: '10:00', timeEnd: '11:00' },
-    { text: 'Treino Muay Thai',           xp: 10, done: false, owner: 'Kayky', date: getTodayISO(), timeStart: '19:00', timeEnd: '20:30' }
-  ],
+  expenses: [],
+  tasks: [],
   badges: [
     { icon:'🎯', title:'No controle',     desc:'Gastar menos da metade da meta da semana.', key:'halfBudget' },
     { icon:'🏆', title:'Lista zerada',    desc:'Concluir todas as tarefas do dia.',          key:'allDone'    },
@@ -72,9 +116,6 @@ const state = {
   ],
   unlocked: {}
 };
-state.spent = state.expenses.reduce((s, e) => s + e.value, 0);
-
-loadTasks();
 
 const dayLabels  = ['seg','ter','qua','qui','sex','sáb','dom'];
 const dayFull    = ['domingo','segunda','terça','quarta','quinta','sexta','sábado'];
@@ -300,6 +341,7 @@ function renderBadges(){
 function deleteExpense(i){
   state.spent -= state.expenses[i].value;
   state.expenses.splice(i, 1);
+  saveUserData();
   render();
 }
 
@@ -436,6 +478,7 @@ function addExpense(){
   state.spent     += value;
   descInput.value  = '';
   valueInput.value = '';
+  saveUserData();
   render();
   checkAchievements();
 }
@@ -443,6 +486,7 @@ function addExpense(){
 function updateIncome(){
   const v      = parseFloat(document.getElementById('income-value').value);
   state.income = isNaN(v) ? 0 : v;
+  saveUserData();
   render();
 }
 
@@ -450,6 +494,7 @@ function updateBudgetGoal(){
   const v         = parseFloat(document.getElementById('budget-goal').value);
   state.budgetGoal = isNaN(v) ? 0 : v;
   state.spentGoal  = state.budgetGoal;
+  saveUserData();
   render();
 }
 
@@ -548,6 +593,7 @@ function checkAchievements(){
 
 function unlock(key, icon, title, body){
   state.unlocked[key] = true;
+  saveUserData();
   showToast(icon, title, body);
 }
 
@@ -570,6 +616,13 @@ document.querySelectorAll('.day-pick').forEach(btn => {
   btn.addEventListener('click', () => btn.classList.toggle('active'));
 });
 
-document.getElementById('budget-goal').value  = state.budgetGoal;
-document.getElementById('income-value').value = state.income || '';
-render();
+const savedUser = localStorage.getItem('trilha-user');
+if (savedUser){
+  currentUser = savedUser;
+  loadUserData(savedUser);
+  document.getElementById('user-display').textContent = savedUser;
+  document.getElementById('welcome-screen').classList.add('hidden');
+  document.getElementById('budget-goal').value  = state.budgetGoal;
+  document.getElementById('income-value').value = state.income || '';
+  render();
+}
