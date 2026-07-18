@@ -369,6 +369,7 @@ footer{ color:var(--ink-dim); font-size:12px; margin-top:20px; }
   /* Impede zoom automático do iOS em inputs com font-size < 16px */
   .add-row input, .add-row select,
   .expense-row input, .expense-row select,
+  .income-row input,
   .task-edit-text, .task-edit-owner,
   .time-range input{ font-size: 16px; }
 
