@@ -78,38 +78,47 @@ function updateOwnerNames(){
   if (expOwnerSel) expOwnerSel.innerHTML =
     `<option value="${me}">${me}</option>${partnerOpt}`;
 
+  const mobileUser = document.getElementById('mobile-user-display');
+  if (mobileUser) mobileUser.textContent = currentUser || '';
   renderPartnerInfo();
 }
 
+function partnerHTML(){
+  return partnerName
+    ? `<div class="partner-row">
+         <span class="partner-label">com ${partnerName}</span>
+         <button class="partner-edit-btn" onclick="showPartnerEdit()">✎</button>
+       </div>`
+    : `<button class="partner-add-btn" onclick="showPartnerEdit()">+ parceiro(a)</button>`;
+}
+
 function renderPartnerInfo(){
-  const el = document.getElementById('partner-info');
-  if (!el) return;
-  if (partnerName){
-    el.innerHTML = `
-      <div class="partner-row">
-        <span class="partner-label">com ${partnerName}</span>
-        <button class="partner-edit-btn" onclick="showPartnerEdit()">✎</button>
-      </div>`;
-  } else {
-    el.innerHTML = `<button class="partner-add-btn" onclick="showPartnerEdit()">+ parceiro(a)</button>`;
-  }
+  ['partner-info', 'mobile-partner-info'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.innerHTML = partnerHTML();
+  });
 }
 
 function showPartnerEdit(){
-  const el = document.getElementById('partner-info');
-  el.innerHTML = `
+  const editHTML = `
     <div class="partner-edit-row">
       <input id="partner-edit-input" class="partner-edit-input"
              value="${partnerName}" placeholder="Nome do(a) parceiro(a)">
       <button class="partner-save-btn" onclick="savePartnerEdit()">✓</button>
       <button class="partner-cancel-btn" onclick="renderPartnerInfo()">×</button>
     </div>`;
+  ['partner-info', 'mobile-partner-info'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.innerHTML = editHTML;
+  });
   const inp = document.getElementById('partner-edit-input');
-  inp.focus();
-  inp.onkeydown = e => {
-    if (e.key === 'Enter')  savePartnerEdit();
-    if (e.key === 'Escape') renderPartnerInfo();
-  };
+  if (inp){
+    inp.focus();
+    inp.onkeydown = e => {
+      if (e.key === 'Enter')  savePartnerEdit();
+      if (e.key === 'Escape') renderPartnerInfo();
+    };
+  }
 }
 
 function savePartnerEdit(){
