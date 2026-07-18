@@ -39,16 +39,26 @@ function saveUserData(){
 }
 
 function updateOwnerNames(){
-  const me      = currentUser  || 'Eu';
-  const partner = partnerName  || 'Parceiro(a)';
+  const me          = currentUser || 'Eu';
+  const hasPartner  = !!partnerName;
+  const partnerOpt  = hasPartner
+    ? `<option value="${partnerName}">${partnerName}</option>` : '';
 
   // Tabs de filtro
   const tabMe      = document.querySelector('#owner-tabs [data-slot="me"]');
   const tabPartner = document.querySelector('#owner-tabs [data-slot="partner"]');
-  if (tabMe)      { tabMe.dataset.owner      = me;      tabMe.textContent      = me;      }
-  if (tabPartner) { tabPartner.dataset.owner = partner; tabPartner.textContent = partner; }
+  if (tabMe){ tabMe.dataset.owner = me; tabMe.textContent = me; tabMe.style.display = ''; }
+  if (tabPartner){
+    if (hasPartner){
+      tabPartner.dataset.owner  = partnerName;
+      tabPartner.textContent    = partnerName;
+      tabPartner.style.display  = '';
+    } else {
+      tabPartner.style.display = 'none';
+    }
+  }
 
-  // Reanexa listeners nas tabs (reset completo)
+  // Reanexa listeners nas tabs
   document.querySelectorAll('.owner-tab').forEach(tab => {
     tab.onclick = () => {
       document.querySelectorAll('.owner-tab').forEach(t => t.classList.remove('active'));
@@ -61,12 +71,12 @@ function updateOwnerNames(){
   // Select de tarefa
   const taskOwnerSel = document.getElementById('new-task-owner');
   if (taskOwnerSel) taskOwnerSel.innerHTML =
-    `<option value="${me}">${me}</option><option value="${partner}">${partner}</option>`;
+    `<option value="${me}">${me}</option>${partnerOpt}`;
 
   // Select de gasto
   const expOwnerSel = document.getElementById('expense-owner');
   if (expOwnerSel) expOwnerSel.innerHTML =
-    `<option value="${me}">${me}</option><option value="${partner}">${partner}</option>`;
+    `<option value="${me}">${me}</option>${partnerOpt}`;
 }
 
 function loadUserData(name){
@@ -401,7 +411,7 @@ function editTask(i){
       </div>
       <select class="task-edit-owner">
         <option value="${currentUser}" ${task.owner === currentUser ? 'selected' : ''}>${currentUser}</option>
-        <option value="${partnerName}" ${task.owner === partnerName ? 'selected' : ''}>${partnerName}</option>
+        ${partnerName ? `<option value="${partnerName}" ${task.owner === partnerName ? 'selected' : ''}>${partnerName}</option>` : ''}
       </select>
       <button class="btn-save-edit" onclick="saveTaskEdit(${i})">Salvar</button>
       <button class="btn-cancel-edit" onclick="renderTasks()">Cancelar</button>
